@@ -21,6 +21,10 @@ void printUsage() {
 
 bool isValidPlayer(char playerId) {
     // TODO: Implement this function
+    if(playerId >= '0' && playerId <= '9'){
+        return true;
+    }
+
     return false;
 }
 
@@ -32,17 +36,47 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
 Position findPlayer(Labyrinth *labyrinth, char playerId) {
     // TODO: Implement this function
     Position pos = {-1, -1};
+    int n = labyrinth->rows;
+    int m = labyrinth->cols;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(labyrinth->map[i][j] == playerId){
+                pos.row = i, pos.col = j;
+            }
+        }
+    }
     return pos;
 }
 
 Position findFirstEmptySpace(Labyrinth *labyrinth) {
     // TODO: Implement this function
     Position pos = {-1, -1};
+    int n = labyrinth->rows;
+    int m = labyrinth->cols;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(labyrinth->map[i][j] == '.'){
+                pos.row = i, pos.col = j;
+                return pos;
+            }
+        }
+    }
     return pos;
 }
 
 bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
     // TODO: Implement this function
+    int n = labyrinth->rows;
+    int m = labyrinth->cols;
+    // out boundary
+    if(row < 0 || row >= n || col < 0 || col >= m){
+        return false;
+    }   
+    // only . is moveable
+    if(labyrinth->map[row][col] == '.'){
+        return true;
+    }
+
     return false;
 }
 
