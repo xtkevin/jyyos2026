@@ -8,6 +8,8 @@
 
 int main(int argc, char *argv[]) {
     // TODO: Implement this function
+
+
     return 0;
 }
 
@@ -131,12 +133,58 @@ bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
 
 bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
     // TODO: Implement this function
+    int row = labyrinth->rows;
+    int col = labyrinth->cols;
+    Position pos = findPlayer(labyrinth, playerId);
+    if(pos.row == -1 || pos.col == -1){
+        Position emptyPos = findFirstEmptySpace(labyrinth);
+        if(emptyPos.row == -1 || emptyPos.col == -1){
+            return false;
+        }else{
+            labyrinth->map[emptyPos.row][emptyPos.col] = playerId;
+            return true;
+        }
+    }else{
+        int newRow = pos.row;
+        int newCol = pos.col;
+        if(strcmp(direction, "up") == 0){
+            newRow--;
+        }else if(strcmp(direction, "down") == 0){
+            newRow++;
+        }else if(strcmp(direction, "left") == 0){
+            newCol--;
+        }else if(strcmp(direction, "right") == 0){
+            newCol++;
+        }else{
+            return false;
+        }
+        if(isEmptySpace(labyrinth, newRow, newCol)){
+            labyrinth->map[pos.row][pos.col] = '.';
+            labyrinth->map[newRow][newCol] = playerId;
+            return true;
+        }
+    }
+    
     return false;
 }
 
 bool saveMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
-    return false;
+    FILE *file = fopen(filename, "w");
+    if(file == NULL){
+        fclose(file);
+        return false;
+    }
+
+    for(int i = 0; i < labyrinth->rows; i++){
+        for(int j = 0; j < labyrinth->cols; j++){
+            fputc(labyrinth->map[i][j], file);
+        }
+        fputc('\n', file);
+    }
+
+    fclose(file);
+    return true;
 }
 
 // Check if all empty spaces are connected using DFS
