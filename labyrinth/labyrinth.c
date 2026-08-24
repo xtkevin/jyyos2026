@@ -21,28 +21,111 @@ void printUsage() {
 
 bool isValidPlayer(char playerId) {
     // TODO: Implement this function
+    if(playerId >= '0' && playerId <= '9'){
+        return true;
+    }
+
+    return false;
+}
+
+static bool isValidChar(char x){
+    if( (x >= '0' && x <= '9') || x == '#' || x == '.'){
+        return true;
+    }
+    
     return false;
 }
 
 bool loadMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
-    return false;
+    FILE *file = fopen(filename, "r");
+    if(file == NULL){
+        return false;
+    }
+    char line[1024];
+    labyrinth->cols = 0;
+    labyrinth->rows = 0;
+    while(fgets(line, sizeof(line), file) != NULL){
+        int col = 0;
+        if(labyrinth->rows >= MAX_ROWS){
+            fclose(file);
+            return false;
+        }
+        for(int i = 0; line[i] != '\n' && line[i] != '\r' && line[i] != '\0'; i++){
+            if(!isValidChar(line[i])){
+                fclose(file);
+                return false;
+            }
+            col++;
+            if(col > MAX_COLS){
+                fclose(file);
+                return false;
+            }
+            labyrinth->map[labyrinth->rows][i] = line[i];
+            
+        }
+        if(labyrinth->cols == 0){
+            labyrinth->cols = col;
+        }else{
+            if(labyrinth->cols != col){
+                fclose(file);
+                return false;
+            }
+        }
+        labyrinth->rows++;
+    }
+
+    fclose(file);
+
+    return labyrinth->rows > 0 && labyrinth->rows <= MAX_ROWS;
 }
 
 Position findPlayer(Labyrinth *labyrinth, char playerId) {
     // TODO: Implement this function
     Position pos = {-1, -1};
+    int n = labyrinth->rows;
+    int m = labyrinth->cols;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(labyrinth->map[i][j] == playerId){
+                pos.row = i;
+                pos.col = j;
+                return pos;
+            }
+        }
+    }
     return pos;
 }
 
 Position findFirstEmptySpace(Labyrinth *labyrinth) {
     // TODO: Implement this function
     Position pos = {-1, -1};
+    int n = labyrinth->rows;
+    int m = labyrinth->cols;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(labyrinth->map[i][j] == '.'){
+                pos.row = i, pos.col = j;
+                return pos;
+            }
+        }
+    }
     return pos;
 }
 
 bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
     // TODO: Implement this function
+    int n = labyrinth->rows;
+    int m = labyrinth->cols;
+    // out boundary
+    if(row < 0 || row >= n || col < 0 || col >= m){
+        return false;
+    }   
+    // only . is moveable
+    if(labyrinth->map[row][col] == '.'){
+        return true;
+    }
+
     return false;
 }
 
