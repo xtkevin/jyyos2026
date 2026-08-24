@@ -40,7 +40,6 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
     FILE *file = fopen(filename, "r");
     if(file == NULL){
-        perror("文件打开失败");
         return false;
     }
     char line[1024];
