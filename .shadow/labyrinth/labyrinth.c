@@ -32,7 +32,7 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
     FILE *file = fopen(filename, "r");
     if(file == NULL){
-        perror("文件打开失败")
+        perror("文件打开失败");
         return false;
     }
     char line[1024];
@@ -47,7 +47,6 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
         if(col > labyrinth->cols){
             labyrinth->cols = col;
         }
-        row++;
 
         labyrinth->rows++;
     }
