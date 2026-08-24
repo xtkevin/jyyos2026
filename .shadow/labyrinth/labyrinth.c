@@ -28,6 +28,14 @@ bool isValidPlayer(char playerId) {
     return false;
 }
 
+bool isValidChar(char x){
+    if( (x >= '0' && x <= '9') || x == '#' || x == '.'){
+        return true;
+    }
+    
+    return false;
+}
+
 bool loadMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
     FILE *file = fopen(filename, "r");
@@ -41,17 +49,28 @@ bool loadMap(Labyrinth *labyrinth, const char *filename) {
     while(fgets(line, sizeof(line), file) != NULL){
         int col = 0;
         for(int i = 0; line[i] != '\n' && line[i] != '\r' && line[i] != '\0'; i++){
+            if(!isValidChar(line[i])){
+                return false;
+            }
             labyrinth->map[labyrinth->rows][i] = line[i];
             col++;
         }
-        if(col > labyrinth->cols){
-            labyrinth->cols = col;
+        if(col > 100){
+            return false;
         }
-
+        if(labyrinth->cols == 0){
+            labyrinth->cols = col;
+        }else{
+            if(labyrinth->cols != col){
+                return false;
+            }
+        }
         labyrinth->rows++;
     }
 
-    return labyrinth->rows > 0;
+    fclose(file);
+
+    return labyrinth->rows > 0 && labyrinth->rows < 100;
 }
 
 Position findPlayer(Labyrinth *labyrinth, char playerId) {
