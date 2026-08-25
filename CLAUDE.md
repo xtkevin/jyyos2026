@@ -17,7 +17,7 @@ cd labyrinth
 make            # default target: commit-and-make (git-trace + build)
 make test       # run TestKit test suite (TK_RUN set by the Makefile flow)
 TK_VERBOSE= make test   # show program output for failed test cases
-make submit     # submit to the Online Judge (needs TOKEN in .shadow/oslab.mk)
+make submit     # NOT AVAILABLE: user is not an NJU student, no TOKEN - never run this
 make clean
 ```
 
@@ -28,7 +28,7 @@ make clean
 
 ## Repo Layout
 
-- `oslab.mk` (root) — sets `TOKEN` and `COURSE`; included by each lab's Makefile.
+- `oslab.mk` (root) — sets `TOKEN` and `COURSE`; included by each lab's Makefile. **The user is NOT an NJU student**: no `TOKEN` exists or will ever exist, so `make submit` / the Online Judge is permanently unavailable. This repo is for self-study of the jyy OS 2026 course only — fetch new labs from the school repo (`nju` remote), learn locally, never attempt submission.
 - `.shadow/` — course-managed snapshot area + the real build rules in `.shadow/oslab.mk`.
 - `testkit/` — course-provided unit/system test framework (do not modify). Tests are written with `UnitTest(name)` and `SystemTest(name, argv)` macros from `testkit.h`; `SystemTest` re-invokes `main()` with a custom argv and captures exit status + output in `struct tk_result`.
 - `labyrinth/` — M1 lab: command-line maze game. `labyrinth.h` declares the required API (loadMap, movePlayer, saveMap, isConnected, ...), `labyrinth.c` is the implementation (main is still TODO), `tests.c` holds TestKit tests, `maps/map.txt` a sample map, `frontend/` optional Python game frontends (`hotseat.py`, `online.py`).
@@ -37,4 +37,4 @@ make clean
 
 - `.gitignore` is whitelist-style: only `.c/.h/.md/Makefile/.py` files and directories are tracked. Build artifacts, map output files, etc. are ignored automatically.
 - Labs must follow UNIX exit-code conventions: 0 = success, 1 = failure on any invalid input/argument (this is graded by the Online Judge).
-- Git remote `origin` is the student's GitHub mirror; submission to the course goes through `make submit`, not git push.
+- Git remotes: `origin` (the user's own GitHub backup, the only thing ever pushed to) and `nju` (the school repo `https://git.nju.edu.cn/jyy/os2026.git`, fetch/merge only - read access, never push). **Labs are distributed on per-lab branches** (`nju/M1` ... `nju/M9`), not on `nju/main` (`main` only holds the shared base: testkit + oslab.mk). To start a new lab: `git fetch nju` then `git merge nju/M2` (etc.) - the merge adds the new lab directory alongside existing ones; each branch only adds its own directory.
