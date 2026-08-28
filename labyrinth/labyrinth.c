@@ -6,8 +6,46 @@
 #include <testkit.h>
 #include "labyrinth.h"
 
+static struct option long_options[] = {
+    {"map",    required_argument, 0, 'm'},
+    {"player", required_argument, 0, 'p'},
+    {"move", required_argument, 0, 'o'},
+    {"version", no_argument, 0, 'v'},
+    {0, 0, 0, 0} // 结束标记
+};
+
+
 int main(int argc, char *argv[]) {
     // TODO: Implement this function
+    int opt;
+    char *map_file = NULL;
+    char *player_id = NULL;
+    char *move_dir = NULL;
+    bool has_version = false;
+    while ((opt = getopt_long(argc, argv, "m:p:", long_options, NULL)) != -1)
+    {
+        switch (opt)
+        {
+            case 'm':
+                map_file = optarg;
+                break;
+            case 'p':
+                player_id = optarg;
+                break;
+            case 'o':
+                move_dir = optarg;
+                break;
+            case 'v':
+                has_version = true;
+                break;
+            default:
+                exit(EXIT_FAILURE);
+        }
+        
+        
+
+    }
+    
 
 
     return 0;
@@ -133,8 +171,6 @@ bool isEmptySpace(Labyrinth *labyrinth, int row, int col) {
 
 bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
     // TODO: Implement this function
-    int row = labyrinth->rows;
-    int col = labyrinth->cols;
     Position pos = findPlayer(labyrinth, playerId);
     if(pos.row == -1 || pos.col == -1){
         Position emptyPos = findFirstEmptySpace(labyrinth);
@@ -142,27 +178,27 @@ bool movePlayer(Labyrinth *labyrinth, char playerId, const char *direction) {
             return false;
         }else{
             labyrinth->map[emptyPos.row][emptyPos.col] = playerId;
-            return true;
+            pos.row = emptyPos.row;
+            pos.col = emptyPos.col;
         }
+    }
+    int newRow = pos.row;
+    int newCol = pos.col;
+    if(strcmp(direction, "up") == 0){
+        newRow--;
+    }else if(strcmp(direction, "down") == 0){
+        newRow++;
+    }else if(strcmp(direction, "left") == 0){
+        newCol--;
+    }else if(strcmp(direction, "right") == 0){
+        newCol++;
     }else{
-        int newRow = pos.row;
-        int newCol = pos.col;
-        if(strcmp(direction, "up") == 0){
-            newRow--;
-        }else if(strcmp(direction, "down") == 0){
-            newRow++;
-        }else if(strcmp(direction, "left") == 0){
-            newCol--;
-        }else if(strcmp(direction, "right") == 0){
-            newCol++;
-        }else{
-            return false;
-        }
-        if(isEmptySpace(labyrinth, newRow, newCol)){
-            labyrinth->map[pos.row][pos.col] = '.';
-            labyrinth->map[newRow][newCol] = playerId;
-            return true;
-        }
+        return false;
+    }
+    if(isEmptySpace(labyrinth, newRow, newCol)){
+        labyrinth->map[pos.row][pos.col] = '.';
+        labyrinth->map[newRow][newCol] = playerId;
+        return true;
     }
     
     return false;
@@ -172,7 +208,6 @@ bool saveMap(Labyrinth *labyrinth, const char *filename) {
     // TODO: Implement this function
     FILE *file = fopen(filename, "w");
     if(file == NULL){
-        fclose(file);
         return false;
     }
 
