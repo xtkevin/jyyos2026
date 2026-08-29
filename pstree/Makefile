@@ -4,3 +4,6 @@ all: $(NAME)
 
 include ../oslab.mk
 include ../.shadow/oslab.mk
+
+test: $(NAME)
+	TK_RUN= ./$(NAME)

@@ -4,6 +4,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <unistd.h>
+#include <getopt.h>
+#include <stdbool.h>
 
 static int read_comm(pid_t pid, char *buf, size_t n) {
     char path[64];
@@ -31,7 +33,46 @@ static int get_ppid_from_stat(pid_t pid, pid_t *ppid_out) {
     return 0;
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
+    // 命令行参数解析
+    struct option long_options[] = {
+        {"show-pids", no_argument, NULL, 'p'},
+        {"numeric-sort", no_argument, NULL, 'n'},
+        {"version", no_argument, NULL, 'V'},
+        {0, 0, 0, 0}
+    };
+    int opt;
+    bool show_pids = false;
+    bool numeric_sort = false;
+    bool show_version = false;
+    while ((opt = getopt_long(argc, argv, "pnV", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 'p':
+                show_pids = true;
+                break;
+            case 'n':
+                numeric_sort = true;
+                break;
+            case 'V':
+                show_version = true;
+                break;
+            default:
+                return 1;
+        }
+    }
+
+    if(show_version && (show_pids || numeric_sort)) {
+        fprintf(stderr, "Error: --version cannot be combined with other options.\n");
+        return 1;
+    }
+    if(show_version) {
+        printf("pstree version 1.0\n");
+        return 0;
+    }
+
+
+
+
     pid_t self = getpid();
     pid_t parent = getppid();
 
