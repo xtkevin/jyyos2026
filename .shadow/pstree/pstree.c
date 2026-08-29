@@ -126,15 +126,21 @@ int build_tree(){
 
 //递归打印进程树
 int print_tree(proc_node *node, const char *prefix, bool is_last){
-    // 打印当前节点：前缀 + 进程名
-    printf("%s%s", prefix, node->comm);
+    // 打印当前节点
+    if(prefix[0] == '\0'){
+        // 根节点：没有连接线
+        printf("%s", node->comm);
+    } else {
+        // 非根节点：前缀 + "|- " 或 "`- "
+        printf("%s%s%s", prefix, is_last ? "`- " : "|- ", node->comm);
+    }
     if(node->pid == getpid()){
         printf(" <== me");
     }
     printf("\n");
 
     // 构建给子节点使用的新前缀
-    char child_prefix[1024];
+    char child_prefix[4096];
     if(prefix[0] == '\0'){
         // 根节点的下一层统一缩进两个空格
         snprintf(child_prefix, sizeof(child_prefix), "  ");
@@ -145,10 +151,7 @@ int print_tree(proc_node *node, const char *prefix, bool is_last){
 
     // 递归打印每个子节点
     for(int i = 0; i < node->n_children; i++){
-        char full_prefix[1024];
-        bool last = (i == node->n_children - 1);
-        snprintf(full_prefix, sizeof(full_prefix), "%s%s", child_prefix, last ? "`- " : "|- ");
-        print_tree(node->children[i], full_prefix, last);
+        print_tree(node->children[i], child_prefix, i == node->n_children - 1);
     }
 
     return 0;
